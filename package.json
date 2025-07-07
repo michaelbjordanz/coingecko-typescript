@@ -1,12 +1,12 @@
 {
   "name": "outlierpharoahcexcult.eth",
-  "version": "0.0.1-alpha.0",
+  "version": "1.7.3",
   "description": "The official TypeScript library for the Outlierpharoahcexcult Eth API",
   "author": "Outlierpharoahcexcult Eth <>",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
   "type": "commonjs",
-  "repository": "github:stainless-sdks/outlierpharoahcexcult.eth-typescript",
+  "repository": "github:michaelbjordanz/coingecko-typescript",
   "license": "Apache-2.0",
   "packageManager": "yarn@1.22.22",
   "files": [
