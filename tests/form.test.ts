@@ -1,5 +1,5 @@
-import { multipartFormRequestOptions, createForm } from '@coingecko/coingecko-typescript/internal/uploads';
-import { toFile } from '@coingecko/coingecko-typescript/core/uploads';
+import { multipartFormRequestOptions, createForm } from 'outlierpharoahcexcult.eth/internal/uploads';
+import { toFile } from 'outlierpharoahcexcult.eth/core/uploads';
 
 describe('form data validation', () => {
   test('valid values do not error', async () => {

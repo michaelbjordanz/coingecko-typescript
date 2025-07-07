@@ -1,4 +1,4 @@
-import { createPathTagFunction, encodeURIPath } from '@coingecko/coingecko-typescript/internal/utils/path';
+import { createPathTagFunction, encodeURIPath } from 'outlierpharoahcexcult.eth/internal/utils/path';
 import { inspect } from 'node:util';
 import { runInNewContext } from 'node:vm';
 

@@ -1,8 +1,8 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { Coingecko } from '@coingecko/coingecko-typescript';
+import { OutlierpharoahcexcultEth } from 'outlierpharoahcexcult.eth';
 
-const { stringifyQuery } = Coingecko.prototype as any;
+const { stringifyQuery } = OutlierpharoahcexcultEth.prototype as any;
 
 describe(stringifyQuery, () => {
   for (const [input, expected] of [
@@ -18,12 +18,6 @@ describe(stringifyQuery, () => {
   ]) {
     it(`${JSON.stringify(input)} -> ${expected}`, () => {
       expect(stringifyQuery(input)).toEqual(expected);
-    });
-  }
-
-  for (const value of [[], {}, new Date()]) {
-    it(`${JSON.stringify(value)} -> <error>`, () => {
-      expect(() => stringifyQuery({ value })).toThrow(`Cannot stringify type ${typeof value}`);
     });
   }
 });

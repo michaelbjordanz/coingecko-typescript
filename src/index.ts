@@ -1,12 +1,12 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-export { Coingecko as default } from './client';
+export { OutlierpharoahcexcultEth as default } from './client';
 
 export { type Uploadable, toFile } from './core/uploads';
 export { APIPromise } from './core/api-promise';
-export { Coingecko, type ClientOptions } from './client';
+export { OutlierpharoahcexcultEth, type ClientOptions } from './client';
 export {
-  CoingeckoError,
+  OutlierpharoahcexcultEthError,
   APIError,
   APIConnectionError,
   APIConnectionTimeoutError,
