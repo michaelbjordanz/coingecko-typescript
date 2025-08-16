@@ -730,9 +730,11 @@ export class OutlierpharoahcexcultEth {
   store: API.Store = new API.Store(this);
   user: API.UserResource = new API.UserResource(this);
 }
+
 OutlierpharoahcexcultEth.PetResource = PetResource;
 OutlierpharoahcexcultEth.Store = Store;
 OutlierpharoahcexcultEth.UserResource = UserResource;
+
 export declare namespace OutlierpharoahcexcultEth {
   export type RequestOptions = Opts.RequestOptions;
 
