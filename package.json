@@ -1,6 +1,6 @@
 {
   "name": "outlierpharoahcexcult.eth",
-  "version": "1.7.3",
+  "version": "1.8.0",
   "description": "The official TypeScript library for the Outlierpharoahcexcult Eth API",
   "author": "Outlierpharoahcexcult Eth <>",
   "types": "dist/index.d.ts",
