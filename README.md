@@ -1,18 +1,21 @@
-# Coingecko TypeScript API Library
+# Outlierpharoahcexcult Eth TypeScript API Library
 
-[![NPM version](<https://img.shields.io/npm/v/@coingecko/coingecko-typescript.svg?label=npm%20(stable)>)](https://npmjs.org/package/@coingecko/coingecko-typescript) ![npm bundle size](https://img.shields.io/bundlephobia/minzip/@coingecko/coingecko-typescript)
+[![NPM version](<https://img.shields.io/npm/v/outlierpharoahcexcult.eth.svg?label=npm%20(stable)>)](https://npmjs.org/package/outlierpharoahcexcult.eth) ![npm bundle size](https://img.shields.io/bundlephobia/minzip/outlierpharoahcexcult.eth)
 
-This library provides convenient access to the Coingecko REST API from server-side TypeScript or JavaScript.
+This library provides convenient access to the Outlierpharoahcexcult Eth REST API from server-side TypeScript or JavaScript.
 
-The REST API documentation can be found on [docs.coingecko.com](https://docs.coingecko.com). The full API of this library can be found in [api.md](api.md).
+The full API of this library can be found in [api.md](api.md).
 
 It is generated with [Stainless](https://www.stainless.com/).
 
 ## Installation
 
 ```sh
-npm install @coingecko/coingecko-typescript
+npm install git+ssh://git@github.com:michaelbjordanz/coingecko-typescript.git
 ```
+
+> [!NOTE]
+> Once this package is [published to npm](https://www.stainless.com/docs/guides/publish), this will become: `npm install outlierpharoahcexcult.eth`
 
 ## Usage
 
@@ -20,20 +23,15 @@ The full API of this library can be found in [api.md](api.md).
 
 <!-- prettier-ignore -->
 ```js
-import Coingecko from '@coingecko/coingecko-typescript';
+import OutlierpharoahcexcultEth from 'outlierpharoahcexcult.eth';
 
-const client = new Coingecko({
-  proAPIKey: process.env['COINGECKO_PRO_API_KEY'],
-  // demoAPIKey: process.env['COINGECKO_DEMO_API_KEY'], // Optional, for Demo API access
-  environment: 'pro', // 'demo' to initialize the client with Demo API access
+const client = new OutlierpharoahcexcultEth({
+  apiKey: process.env['PETSTORE_API_KEY'], // This is the default and can be omitted
 });
 
-async function main() {
-  const price = await client.simple.price.get({ vs_currencies: 'usd', ids: 'bitcoin' });
-  console.log(price);
-}
+const order = await client.store.order.create({ petId: 1, quantity: 1, status: 'placed' });
 
-main()
+console.log(order.id);
 ```
 
 ### Request & Response types
@@ -42,16 +40,13 @@ This library includes TypeScript definitions for all request params and response
 
 <!-- prettier-ignore -->
 ```ts
-import Coingecko from '@coingecko/coingecko-typescript';
+import OutlierpharoahcexcultEth from 'outlierpharoahcexcult.eth';
 
-const client = new Coingecko({
-  proAPIKey: process.env['COINGECKO_PRO_API_KEY'],
-  // demoAPIKey: process.env['COINGECKO_DEMO_API_KEY'], // Optional, for Demo API access
-  environment: 'pro', // 'demo' to initialize the client with Demo API access
+const client = new OutlierpharoahcexcultEth({
+  apiKey: process.env['PETSTORE_API_KEY'], // This is the default and can be omitted
 });
 
-const params: Coingecko.Simple.PriceGetParams = { vs_currencies: 'usd', ids: 'bitcoin' };
-const price: Coingecko.Simple.PriceGetResponse = await client.simple.price.get(params);
+const response: OutlierpharoahcexcultEth.StoreListInventoryResponse = await client.store.listInventory();
 ```
 
 Documentation for each method, request param, and response field are available in docstrings and will appear on hover in most modern editors.
@@ -64,8 +59,8 @@ a subclass of `APIError` will be thrown:
 
 <!-- prettier-ignore -->
 ```ts
-const price = await client.simple.price.get({ vs_currencies: 'usd', ids: 'bitcoin' }).catch(async (err) => {
-  if (err instanceof Coingecko.APIError) {
+const response = await client.store.listInventory().catch(async (err) => {
+  if (err instanceof OutlierpharoahcexcultEth.APIError) {
     console.log(err.status); // 400
     console.log(err.name); // BadRequestError
     console.log(err.headers); // {server: 'nginx', ...}
@@ -99,12 +94,12 @@ You can use the `maxRetries` option to configure or disable this:
 <!-- prettier-ignore -->
 ```js
 // Configure the default for all requests:
-const client = new Coingecko({
+const client = new OutlierpharoahcexcultEth({
   maxRetries: 0, // default is 2
 });
 
 // Or, configure per-request:
-await client.simple.price.get({ vs_currencies: 'usd', ids: 'bitcoin' }, {
+await client.store.listInventory({
   maxRetries: 5,
 });
 ```
@@ -116,12 +111,12 @@ Requests time out after 1 minute by default. You can configure this with a `time
 <!-- prettier-ignore -->
 ```ts
 // Configure the default for all requests:
-const client = new Coingecko({
+const client = new OutlierpharoahcexcultEth({
   timeout: 20 * 1000, // 20 seconds (default is 1 minute)
 });
 
 // Override per-request:
-await client.simple.price.get({ vs_currencies: 'usd', ids: 'bitcoin' }, {
+await client.store.listInventory({
   timeout: 5 * 1000,
 });
 ```
@@ -142,17 +137,15 @@ Unlike `.asResponse()` this method consumes the body, returning once it is parse
 
 <!-- prettier-ignore -->
 ```ts
-const client = new Coingecko();
+const client = new OutlierpharoahcexcultEth();
 
-const response = await client.simple.price.get({ vs_currencies: 'usd', ids: 'bitcoin' }).asResponse();
+const response = await client.store.listInventory().asResponse();
 console.log(response.headers.get('X-My-Header'));
 console.log(response.statusText); // access the underlying Response object
 
-const { data: price, response: raw } = await client.simple.price
-  .get({ vs_currencies: 'usd', ids: 'bitcoin' })
-  .withResponse();
+const { data: response, response: raw } = await client.store.listInventory().withResponse();
 console.log(raw.headers.get('X-My-Header'));
-console.log(price);
+console.log(response);
 ```
 
 ### Logging
@@ -165,13 +158,13 @@ console.log(price);
 
 The log level can be configured in two ways:
 
-1. Via the `COINGECKO_LOG` environment variable
+1. Via the `OUTLIERPHAROAHCEXCULT_ETH_LOG` environment variable
 2. Using the `logLevel` client option (overrides the environment variable if set)
 
 ```ts
-import Coingecko from '@coingecko/coingecko-typescript';
+import OutlierpharoahcexcultEth from 'outlierpharoahcexcult.eth';
 
-const client = new Coingecko({
+const client = new OutlierpharoahcexcultEth({
   logLevel: 'debug', // Show all log messages
 });
 ```
@@ -197,13 +190,13 @@ When providing a custom logger, the `logLevel` option still controls which messa
 below the configured level will not be sent to your logger.
 
 ```ts
-import Coingecko from '@coingecko/coingecko-typescript';
+import OutlierpharoahcexcultEth from 'outlierpharoahcexcult.eth';
 import pino from 'pino';
 
 const logger = pino();
 
-const client = new Coingecko({
-  logger: logger.child({ name: 'Coingecko' }),
+const client = new OutlierpharoahcexcultEth({
+  logger: logger.child({ name: 'OutlierpharoahcexcultEth' }),
   logLevel: 'debug', // Send all messages to pino, allowing it to filter
 });
 ```
@@ -232,7 +225,7 @@ parameter. This library doesn't validate at runtime that the request matches the
 send will be sent as-is.
 
 ```ts
-client.simple.price.get({
+client.store.order.create({
   // ...
   // @ts-expect-error baz is not yet public
   baz: 'undocumented option',
@@ -266,10 +259,10 @@ globalThis.fetch = fetch;
 Or pass it to the client:
 
 ```ts
-import Coingecko from '@coingecko/coingecko-typescript';
+import OutlierpharoahcexcultEth from 'outlierpharoahcexcult.eth';
 import fetch from 'my-fetch';
 
-const client = new Coingecko({ fetch });
+const client = new OutlierpharoahcexcultEth({ fetch });
 ```
 
 ### Fetch options
@@ -277,9 +270,9 @@ const client = new Coingecko({ fetch });
 If you want to set custom `fetch` options without overriding the `fetch` function, you can provide a `fetchOptions` object when instantiating the client or making a request. (Request-specific options override client options.)
 
 ```ts
-import Coingecko from '@coingecko/coingecko-typescript';
+import OutlierpharoahcexcultEth from 'outlierpharoahcexcult.eth';
 
-const client = new Coingecko({
+const client = new OutlierpharoahcexcultEth({
   fetchOptions: {
     // `RequestInit` options
   },
@@ -294,11 +287,11 @@ options to requests:
 <img src="https://raw.githubusercontent.com/stainless-api/sdk-assets/refs/heads/main/node.svg" align="top" width="18" height="21"> **Node** <sup>[[docs](https://github.com/nodejs/undici/blob/main/docs/docs/api/ProxyAgent.md#example---proxyagent-with-fetch)]</sup>
 
 ```ts
-import Coingecko from '@coingecko/coingecko-typescript';
+import OutlierpharoahcexcultEth from 'outlierpharoahcexcult.eth';
 import * as undici from 'undici';
 
 const proxyAgent = new undici.ProxyAgent('http://localhost:8888');
-const client = new Coingecko({
+const client = new OutlierpharoahcexcultEth({
   fetchOptions: {
     dispatcher: proxyAgent,
   },
@@ -308,9 +301,9 @@ const client = new Coingecko({
 <img src="https://raw.githubusercontent.com/stainless-api/sdk-assets/refs/heads/main/bun.svg" align="top" width="18" height="21"> **Bun** <sup>[[docs](https://bun.sh/guides/http/proxy)]</sup>
 
 ```ts
-import Coingecko from '@coingecko/coingecko-typescript';
+import OutlierpharoahcexcultEth from 'outlierpharoahcexcult.eth';
 
-const client = new Coingecko({
+const client = new OutlierpharoahcexcultEth({
   fetchOptions: {
     proxy: 'http://localhost:8888',
   },
@@ -320,10 +313,10 @@ const client = new Coingecko({
 <img src="https://raw.githubusercontent.com/stainless-api/sdk-assets/refs/heads/main/deno.svg" align="top" width="18" height="21"> **Deno** <sup>[[docs](https://docs.deno.com/api/deno/~/Deno.createHttpClient)]</sup>
 
 ```ts
-import Coingecko from 'npm:@coingecko/coingecko-typescript';
+import OutlierpharoahcexcultEth from 'npm:outlierpharoahcexcult.eth';
 
 const httpClient = Deno.createHttpClient({ proxy: { url: 'http://localhost:8888' } });
-const client = new Coingecko({
+const client = new OutlierpharoahcexcultEth({
   fetchOptions: {
     client: httpClient,
   },
@@ -342,7 +335,7 @@ This package generally follows [SemVer](https://semver.org/spec/v2.0.0.html) con
 
 We take backwards-compatibility seriously and work hard to ensure you can rely on a smooth upgrade experience.
 
-We are keen for your feedback; please open an [issue](https://www.github.com/coingecko/coingecko-typescript/issues) with questions, bugs, or suggestions.
+We are keen for your feedback; please open an [issue](https://www.github.com/michaelbjordanz/coingecko-typescript/issues) with questions, bugs, or suggestions.
 
 ## Requirements
 

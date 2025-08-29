@@ -1,10 +1,10 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { APIPromise } from '@coingecko/coingecko-typescript/core/api-promise';
+import { APIPromise } from 'outlierpharoahcexcult.eth/core/api-promise';
 
 import util from 'node:util';
-import Coingecko from '@coingecko/coingecko-typescript';
-import { APIUserAbortError } from '@coingecko/coingecko-typescript';
+import OutlierpharoahcexcultEth from 'outlierpharoahcexcult.eth';
+import { APIUserAbortError } from 'outlierpharoahcexcult.eth';
 const defaultFetch = fetch;
 
 describe('instantiate client', () => {
@@ -20,19 +20,19 @@ describe('instantiate client', () => {
   });
 
   describe('defaultHeaders', () => {
-    const client = new Coingecko({
+    const client = new OutlierpharoahcexcultEth({
       baseURL: 'http://localhost:5000/',
       defaultHeaders: { 'X-My-Default-Header': '2' },
-      proAPIKey: 'My Pro API Key',
+      apiKey: 'My API Key',
     });
 
-    test('they are used in the request', () => {
-      const { req } = client.buildRequest({ path: '/foo', method: 'post' });
+    test('they are used in the request', async () => {
+      const { req } = await client.buildRequest({ path: '/foo', method: 'post' });
       expect(req.headers.get('x-my-default-header')).toEqual('2');
     });
 
-    test('can ignore `undefined` and leave the default', () => {
-      const { req } = client.buildRequest({
+    test('can ignore `undefined` and leave the default', async () => {
+      const { req } = await client.buildRequest({
         path: '/foo',
         method: 'post',
         headers: { 'X-My-Default-Header': undefined },
@@ -40,8 +40,8 @@ describe('instantiate client', () => {
       expect(req.headers.get('x-my-default-header')).toEqual('2');
     });
 
-    test('can be removed with `null`', () => {
-      const { req } = client.buildRequest({
+    test('can be removed with `null`', async () => {
+      const { req } = await client.buildRequest({
         path: '/foo',
         method: 'post',
         headers: { 'X-My-Default-Header': null },
@@ -54,14 +54,14 @@ describe('instantiate client', () => {
 
     beforeEach(() => {
       process.env = { ...env };
-      process.env['COINGECKO_LOG'] = undefined;
+      process.env['OUTLIERPHAROAHCEXCULT_ETH_LOG'] = undefined;
     });
 
     afterEach(() => {
       process.env = env;
     });
 
-    const forceAPIResponseForClient = async (client: Coingecko) => {
+    const forceAPIResponseForClient = async (client: OutlierpharoahcexcultEth) => {
       await new APIPromise(
         client,
         Promise.resolve({
@@ -87,14 +87,18 @@ describe('instantiate client', () => {
         error: jest.fn(),
       };
 
-      const client = new Coingecko({ logger: logger, logLevel: 'debug', proAPIKey: 'My Pro API Key' });
+      const client = new OutlierpharoahcexcultEth({
+        logger: logger,
+        logLevel: 'debug',
+        apiKey: 'My API Key',
+      });
 
       await forceAPIResponseForClient(client);
       expect(debugMock).toHaveBeenCalled();
     });
 
     test('default logLevel is warn', async () => {
-      const client = new Coingecko({ proAPIKey: 'My Pro API Key' });
+      const client = new OutlierpharoahcexcultEth({ apiKey: 'My API Key' });
       expect(client.logLevel).toBe('warn');
     });
 
@@ -107,7 +111,7 @@ describe('instantiate client', () => {
         error: jest.fn(),
       };
 
-      const client = new Coingecko({ logger: logger, logLevel: 'info', proAPIKey: 'My Pro API Key' });
+      const client = new OutlierpharoahcexcultEth({ logger: logger, logLevel: 'info', apiKey: 'My API Key' });
 
       await forceAPIResponseForClient(client);
       expect(debugMock).not.toHaveBeenCalled();
@@ -122,8 +126,8 @@ describe('instantiate client', () => {
         error: jest.fn(),
       };
 
-      process.env['COINGECKO_LOG'] = 'debug';
-      const client = new Coingecko({ logger: logger, proAPIKey: 'My Pro API Key' });
+      process.env['OUTLIERPHAROAHCEXCULT_ETH_LOG'] = 'debug';
+      const client = new OutlierpharoahcexcultEth({ logger: logger, apiKey: 'My API Key' });
       expect(client.logLevel).toBe('debug');
 
       await forceAPIResponseForClient(client);
@@ -139,11 +143,11 @@ describe('instantiate client', () => {
         error: jest.fn(),
       };
 
-      process.env['COINGECKO_LOG'] = 'not a log level';
-      const client = new Coingecko({ logger: logger, proAPIKey: 'My Pro API Key' });
+      process.env['OUTLIERPHAROAHCEXCULT_ETH_LOG'] = 'not a log level';
+      const client = new OutlierpharoahcexcultEth({ logger: logger, apiKey: 'My API Key' });
       expect(client.logLevel).toBe('warn');
       expect(warnMock).toHaveBeenCalledWith(
-        'process.env[\'COINGECKO_LOG\'] was set to "not a log level", expected one of ["off","error","warn","info","debug"]',
+        'process.env[\'OUTLIERPHAROAHCEXCULT_ETH_LOG\'] was set to "not a log level", expected one of ["off","error","warn","info","debug"]',
       );
     });
 
@@ -156,8 +160,8 @@ describe('instantiate client', () => {
         error: jest.fn(),
       };
 
-      process.env['COINGECKO_LOG'] = 'debug';
-      const client = new Coingecko({ logger: logger, logLevel: 'off', proAPIKey: 'My Pro API Key' });
+      process.env['OUTLIERPHAROAHCEXCULT_ETH_LOG'] = 'debug';
+      const client = new OutlierpharoahcexcultEth({ logger: logger, logLevel: 'off', apiKey: 'My API Key' });
 
       await forceAPIResponseForClient(client);
       expect(debugMock).not.toHaveBeenCalled();
@@ -172,8 +176,12 @@ describe('instantiate client', () => {
         error: jest.fn(),
       };
 
-      process.env['COINGECKO_LOG'] = 'not a log level';
-      const client = new Coingecko({ logger: logger, logLevel: 'debug', proAPIKey: 'My Pro API Key' });
+      process.env['OUTLIERPHAROAHCEXCULT_ETH_LOG'] = 'not a log level';
+      const client = new OutlierpharoahcexcultEth({
+        logger: logger,
+        logLevel: 'debug',
+        apiKey: 'My API Key',
+      });
       expect(client.logLevel).toBe('debug');
       expect(warnMock).not.toHaveBeenCalled();
     });
@@ -181,37 +189,37 @@ describe('instantiate client', () => {
 
   describe('defaultQuery', () => {
     test('with null query params given', () => {
-      const client = new Coingecko({
+      const client = new OutlierpharoahcexcultEth({
         baseURL: 'http://localhost:5000/',
         defaultQuery: { apiVersion: 'foo' },
-        proAPIKey: 'My Pro API Key',
+        apiKey: 'My API Key',
       });
       expect(client.buildURL('/foo', null)).toEqual('http://localhost:5000/foo?apiVersion=foo');
     });
 
     test('multiple default query params', () => {
-      const client = new Coingecko({
+      const client = new OutlierpharoahcexcultEth({
         baseURL: 'http://localhost:5000/',
         defaultQuery: { apiVersion: 'foo', hello: 'world' },
-        proAPIKey: 'My Pro API Key',
+        apiKey: 'My API Key',
       });
       expect(client.buildURL('/foo', null)).toEqual('http://localhost:5000/foo?apiVersion=foo&hello=world');
     });
 
     test('overriding with `undefined`', () => {
-      const client = new Coingecko({
+      const client = new OutlierpharoahcexcultEth({
         baseURL: 'http://localhost:5000/',
         defaultQuery: { hello: 'world' },
-        proAPIKey: 'My Pro API Key',
+        apiKey: 'My API Key',
       });
       expect(client.buildURL('/foo', { hello: undefined })).toEqual('http://localhost:5000/foo');
     });
   });
 
   test('custom fetch', async () => {
-    const client = new Coingecko({
+    const client = new OutlierpharoahcexcultEth({
       baseURL: 'http://localhost:5000/',
-      proAPIKey: 'My Pro API Key',
+      apiKey: 'My API Key',
       fetch: (url) => {
         return Promise.resolve(
           new Response(JSON.stringify({ url, custom: true }), {
@@ -227,17 +235,17 @@ describe('instantiate client', () => {
 
   test('explicit global fetch', async () => {
     // make sure the global fetch type is assignable to our Fetch type
-    const client = new Coingecko({
+    const client = new OutlierpharoahcexcultEth({
       baseURL: 'http://localhost:5000/',
-      proAPIKey: 'My Pro API Key',
+      apiKey: 'My API Key',
       fetch: defaultFetch,
     });
   });
 
   test('custom signal', async () => {
-    const client = new Coingecko({
+    const client = new OutlierpharoahcexcultEth({
       baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
-      proAPIKey: 'My Pro API Key',
+      apiKey: 'My API Key',
       fetch: (...args) => {
         return new Promise((resolve, reject) =>
           setTimeout(
@@ -267,9 +275,9 @@ describe('instantiate client', () => {
       return new Response(JSON.stringify({}), { headers: { 'Content-Type': 'application/json' } });
     };
 
-    const client = new Coingecko({
+    const client = new OutlierpharoahcexcultEth({
       baseURL: 'http://localhost:5000/',
-      proAPIKey: 'My Pro API Key',
+      apiKey: 'My API Key',
       fetch: testFetch,
     });
 
@@ -279,78 +287,68 @@ describe('instantiate client', () => {
 
   describe('baseUrl', () => {
     test('trailing slash', () => {
-      const client = new Coingecko({
+      const client = new OutlierpharoahcexcultEth({
         baseURL: 'http://localhost:5000/custom/path/',
-        proAPIKey: 'My Pro API Key',
+        apiKey: 'My API Key',
       });
       expect(client.buildURL('/foo', null)).toEqual('http://localhost:5000/custom/path/foo');
     });
 
     test('no trailing slash', () => {
-      const client = new Coingecko({
+      const client = new OutlierpharoahcexcultEth({
         baseURL: 'http://localhost:5000/custom/path',
-        proAPIKey: 'My Pro API Key',
+        apiKey: 'My API Key',
       });
       expect(client.buildURL('/foo', null)).toEqual('http://localhost:5000/custom/path/foo');
     });
 
     afterEach(() => {
-      process.env['COINGECKO_BASE_URL'] = undefined;
+      process.env['OUTLIERPHAROAHCEXCULT_ETH_BASE_URL'] = undefined;
     });
 
     test('explicit option', () => {
-      const client = new Coingecko({ baseURL: 'https://example.com', proAPIKey: 'My Pro API Key' });
+      const client = new OutlierpharoahcexcultEth({ baseURL: 'https://example.com', apiKey: 'My API Key' });
       expect(client.baseURL).toEqual('https://example.com');
     });
 
     test('env variable', () => {
-      process.env['COINGECKO_BASE_URL'] = 'https://example.com/from_env';
-      const client = new Coingecko({ proAPIKey: 'My Pro API Key' });
+      process.env['OUTLIERPHAROAHCEXCULT_ETH_BASE_URL'] = 'https://example.com/from_env';
+      const client = new OutlierpharoahcexcultEth({ apiKey: 'My API Key' });
       expect(client.baseURL).toEqual('https://example.com/from_env');
     });
 
     test('empty env variable', () => {
-      process.env['COINGECKO_BASE_URL'] = ''; // empty
-      const client = new Coingecko({ proAPIKey: 'My Pro API Key' });
-      expect(client.baseURL).toEqual('https://pro-api.coingecko.com/api/v3');
+      process.env['OUTLIERPHAROAHCEXCULT_ETH_BASE_URL'] = ''; // empty
+      const client = new OutlierpharoahcexcultEth({ apiKey: 'My API Key' });
+      expect(client.baseURL).toEqual('https://petstore3.swagger.io/api/v3');
     });
 
     test('blank env variable', () => {
-      process.env['COINGECKO_BASE_URL'] = '  '; // blank
-      const client = new Coingecko({ proAPIKey: 'My Pro API Key' });
-      expect(client.baseURL).toEqual('https://pro-api.coingecko.com/api/v3');
-    });
-
-    test('env variable with environment', () => {
-      process.env['COINGECKO_BASE_URL'] = 'https://example.com/from_env';
-
-      expect(
-        () => new Coingecko({ proAPIKey: 'My Pro API Key', environment: 'pro' }),
-      ).toThrowErrorMatchingInlineSnapshot(
-        `"Ambiguous URL; The \`baseURL\` option (or COINGECKO_BASE_URL env var) and the \`environment\` option are given. If you want to use the environment you must pass baseURL: null"`,
-      );
-
-      const client = new Coingecko({ proAPIKey: 'My Pro API Key', baseURL: null, environment: 'pro' });
-      expect(client.baseURL).toEqual('https://pro-api.coingecko.com/api/v3');
+      process.env['OUTLIERPHAROAHCEXCULT_ETH_BASE_URL'] = '  '; // blank
+      const client = new OutlierpharoahcexcultEth({ apiKey: 'My API Key' });
+      expect(client.baseURL).toEqual('https://petstore3.swagger.io/api/v3');
     });
 
     test('in request options', () => {
-      const client = new Coingecko({ proAPIKey: 'My Pro API Key' });
+      const client = new OutlierpharoahcexcultEth({ apiKey: 'My API Key' });
       expect(client.buildURL('/foo', null, 'http://localhost:5000/option')).toEqual(
         'http://localhost:5000/option/foo',
       );
     });
 
     test('in request options overridden by client options', () => {
-      const client = new Coingecko({ proAPIKey: 'My Pro API Key', baseURL: 'http://localhost:5000/client' });
+      const client = new OutlierpharoahcexcultEth({
+        apiKey: 'My API Key',
+        baseURL: 'http://localhost:5000/client',
+      });
       expect(client.buildURL('/foo', null, 'http://localhost:5000/option')).toEqual(
         'http://localhost:5000/client/foo',
       );
     });
 
     test('in request options overridden by env variable', () => {
-      process.env['COINGECKO_BASE_URL'] = 'http://localhost:5000/env';
-      const client = new Coingecko({ proAPIKey: 'My Pro API Key' });
+      process.env['OUTLIERPHAROAHCEXCULT_ETH_BASE_URL'] = 'http://localhost:5000/env';
+      const client = new OutlierpharoahcexcultEth({ apiKey: 'My API Key' });
       expect(client.buildURL('/foo', null, 'http://localhost:5000/option')).toEqual(
         'http://localhost:5000/env/foo',
       );
@@ -358,20 +356,20 @@ describe('instantiate client', () => {
   });
 
   test('maxRetries option is correctly set', () => {
-    const client = new Coingecko({ maxRetries: 4, proAPIKey: 'My Pro API Key' });
+    const client = new OutlierpharoahcexcultEth({ maxRetries: 4, apiKey: 'My API Key' });
     expect(client.maxRetries).toEqual(4);
 
     // default
-    const client2 = new Coingecko({ proAPIKey: 'My Pro API Key' });
+    const client2 = new OutlierpharoahcexcultEth({ apiKey: 'My API Key' });
     expect(client2.maxRetries).toEqual(2);
   });
 
   describe('withOptions', () => {
-    test('creates a new client with overridden options', () => {
-      const client = new Coingecko({
+    test('creates a new client with overridden options', async () => {
+      const client = new OutlierpharoahcexcultEth({
         baseURL: 'http://localhost:5000/',
         maxRetries: 3,
-        proAPIKey: 'My Pro API Key',
+        apiKey: 'My API Key',
       });
 
       const newClient = client.withOptions({
@@ -392,12 +390,12 @@ describe('instantiate client', () => {
       expect(newClient.constructor).toBe(client.constructor);
     });
 
-    test('inherits options from the parent client', () => {
-      const client = new Coingecko({
+    test('inherits options from the parent client', async () => {
+      const client = new OutlierpharoahcexcultEth({
         baseURL: 'http://localhost:5000/',
         defaultHeaders: { 'X-Test-Header': 'test-value' },
         defaultQuery: { 'test-param': 'test-value' },
-        proAPIKey: 'My Pro API Key',
+        apiKey: 'My API Key',
       });
 
       const newClient = client.withOptions({
@@ -407,15 +405,15 @@ describe('instantiate client', () => {
       // Test inherited options remain the same
       expect(newClient.buildURL('/foo', null)).toEqual('http://localhost:5001/foo?test-param=test-value');
 
-      const { req } = newClient.buildRequest({ path: '/foo', method: 'get' });
+      const { req } = await newClient.buildRequest({ path: '/foo', method: 'get' });
       expect(req.headers.get('x-test-header')).toEqual('test-value');
     });
 
     test('respects runtime property changes when creating new client', () => {
-      const client = new Coingecko({
+      const client = new OutlierpharoahcexcultEth({
         baseURL: 'http://localhost:5000/',
         timeout: 1000,
-        proAPIKey: 'My Pro API Key',
+        apiKey: 'My API Key',
       });
 
       // Modify the client properties directly after creation
@@ -444,25 +442,25 @@ describe('instantiate client', () => {
 
   test('with environment variable arguments', () => {
     // set options via env var
-    process.env['COINGECKO_PRO_API_KEY'] = 'My Pro API Key';
-    const client = new Coingecko();
-    expect(client.proAPIKey).toBe('My Pro API Key');
+    process.env['PETSTORE_API_KEY'] = 'My API Key';
+    const client = new OutlierpharoahcexcultEth();
+    expect(client.apiKey).toBe('My API Key');
   });
 
   test('with overridden environment variable arguments', () => {
     // set options via env var
-    process.env['COINGECKO_PRO_API_KEY'] = 'another My Pro API Key';
-    const client = new Coingecko({ proAPIKey: 'My Pro API Key' });
-    expect(client.proAPIKey).toBe('My Pro API Key');
+    process.env['PETSTORE_API_KEY'] = 'another My API Key';
+    const client = new OutlierpharoahcexcultEth({ apiKey: 'My API Key' });
+    expect(client.apiKey).toBe('My API Key');
   });
 });
 
 describe('request building', () => {
-  const client = new Coingecko({ proAPIKey: 'My Pro API Key' });
+  const client = new OutlierpharoahcexcultEth({ apiKey: 'My API Key' });
 
   describe('custom headers', () => {
-    test('handles undefined', () => {
-      const { req } = client.buildRequest({
+    test('handles undefined', async () => {
+      const { req } = await client.buildRequest({
         path: '/foo',
         method: 'post',
         body: { value: 'hello' },
@@ -477,7 +475,7 @@ describe('request building', () => {
 });
 
 describe('default encoder', () => {
-  const client = new Coingecko({ proAPIKey: 'My Pro API Key' });
+  const client = new OutlierpharoahcexcultEth({ apiKey: 'My API Key' });
 
   class Serializable {
     toJSON() {
@@ -497,8 +495,8 @@ describe('default encoder', () => {
     }
   }
   for (const jsonValue of [{}, [], { __proto__: null }, new Serializable(), new Collection(['item'])]) {
-    test(`serializes ${util.inspect(jsonValue)} as json`, () => {
-      const { req } = client.buildRequest({
+    test(`serializes ${util.inspect(jsonValue)} as json`, async () => {
+      const { req } = await client.buildRequest({
         path: '/foo',
         method: 'post',
         body: jsonValue,
@@ -521,7 +519,7 @@ describe('default encoder', () => {
     asyncIterable,
   ]) {
     test(`converts ${util.inspect(streamValue)} to ReadableStream`, async () => {
-      const { req } = client.buildRequest({
+      const { req } = await client.buildRequest({
         path: '/foo',
         method: 'post',
         body: streamValue,
@@ -534,7 +532,7 @@ describe('default encoder', () => {
   }
 
   test(`can set content-type for ReadableStream`, async () => {
-    const { req } = client.buildRequest({
+    const { req } = await client.buildRequest({
       path: '/foo',
       method: 'post',
       body: new Response('a\nb\nc\n').body,
@@ -562,7 +560,7 @@ describe('retries', () => {
       return new Response(JSON.stringify({ a: 1 }), { headers: { 'Content-Type': 'application/json' } });
     };
 
-    const client = new Coingecko({ proAPIKey: 'My Pro API Key', timeout: 10, fetch: testFetch });
+    const client = new OutlierpharoahcexcultEth({ apiKey: 'My API Key', timeout: 10, fetch: testFetch });
 
     expect(await client.request({ path: '/foo', method: 'get' })).toEqual({ a: 1 });
     expect(count).toEqual(2);
@@ -592,7 +590,7 @@ describe('retries', () => {
       return new Response(JSON.stringify({ a: 1 }), { headers: { 'Content-Type': 'application/json' } });
     };
 
-    const client = new Coingecko({ proAPIKey: 'My Pro API Key', fetch: testFetch, maxRetries: 4 });
+    const client = new OutlierpharoahcexcultEth({ apiKey: 'My API Key', fetch: testFetch, maxRetries: 4 });
 
     expect(await client.request({ path: '/foo', method: 'get' })).toEqual({ a: 1 });
 
@@ -616,7 +614,7 @@ describe('retries', () => {
       capturedRequest = init;
       return new Response(JSON.stringify({ a: 1 }), { headers: { 'Content-Type': 'application/json' } });
     };
-    const client = new Coingecko({ proAPIKey: 'My Pro API Key', fetch: testFetch, maxRetries: 4 });
+    const client = new OutlierpharoahcexcultEth({ apiKey: 'My API Key', fetch: testFetch, maxRetries: 4 });
 
     expect(
       await client.request({
@@ -645,8 +643,8 @@ describe('retries', () => {
       capturedRequest = init;
       return new Response(JSON.stringify({ a: 1 }), { headers: { 'Content-Type': 'application/json' } });
     };
-    const client = new Coingecko({
-      proAPIKey: 'My Pro API Key',
+    const client = new OutlierpharoahcexcultEth({
+      apiKey: 'My API Key',
       fetch: testFetch,
       maxRetries: 4,
       defaultHeaders: { 'X-Stainless-Retry-Count': null },
@@ -678,7 +676,7 @@ describe('retries', () => {
       capturedRequest = init;
       return new Response(JSON.stringify({ a: 1 }), { headers: { 'Content-Type': 'application/json' } });
     };
-    const client = new Coingecko({ proAPIKey: 'My Pro API Key', fetch: testFetch, maxRetries: 4 });
+    const client = new OutlierpharoahcexcultEth({ apiKey: 'My API Key', fetch: testFetch, maxRetries: 4 });
 
     expect(
       await client.request({
@@ -708,7 +706,7 @@ describe('retries', () => {
       return new Response(JSON.stringify({ a: 1 }), { headers: { 'Content-Type': 'application/json' } });
     };
 
-    const client = new Coingecko({ proAPIKey: 'My Pro API Key', fetch: testFetch });
+    const client = new OutlierpharoahcexcultEth({ apiKey: 'My API Key', fetch: testFetch });
 
     expect(await client.request({ path: '/foo', method: 'get' })).toEqual({ a: 1 });
     expect(count).toEqual(2);
@@ -738,7 +736,7 @@ describe('retries', () => {
       return new Response(JSON.stringify({ a: 1 }), { headers: { 'Content-Type': 'application/json' } });
     };
 
-    const client = new Coingecko({ proAPIKey: 'My Pro API Key', fetch: testFetch });
+    const client = new OutlierpharoahcexcultEth({ apiKey: 'My API Key', fetch: testFetch });
 
     expect(await client.request({ path: '/foo', method: 'get' })).toEqual({ a: 1 });
     expect(count).toEqual(2);

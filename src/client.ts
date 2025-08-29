@@ -11,44 +11,36 @@ import type { APIResponseProps } from './internal/parse';
 import { getPlatformHeaders } from './internal/detect-platform';
 import * as Shims from './internal/shims';
 import * as Opts from './internal/request-options';
+import * as qs from './internal/qs';
 import { VERSION } from './version';
 import * as Errors from './core/error';
 import * as Uploads from './core/uploads';
 import * as API from './resources/index';
 import { APIPromise } from './core/api-promise';
 import {
-  AssetPlatformGetParams,
-  AssetPlatformGetResponse,
-  AssetPlatforms,
-} from './resources/asset-platforms';
-import { ExchangeRateGetResponse, ExchangeRates } from './resources/exchange-rates';
-import { Key, KeyGetResponse } from './resources/key';
-import { Ping, PingGetResponse } from './resources/ping';
-import { TokenListGetAllJsonResponse, TokenLists } from './resources/token-lists';
-import { CoinGetIDParams, CoinGetIDResponse, Coins } from './resources/coins/coins';
-import { Companies } from './resources/companies/companies';
-import { DerivativeGetResponse, Derivatives } from './resources/derivatives/derivatives';
+  Category,
+  Pet,
+  PetCreateParams,
+  PetFindByStatusParams,
+  PetFindByStatusResponse,
+  PetFindByTagsParams,
+  PetFindByTagsResponse,
+  PetResource,
+  PetUpdateByIDParams,
+  PetUpdateParams,
+  PetUploadImageParams,
+  PetUploadImageResponse,
+} from './resources/pet';
 import {
-  ExchangeGetIDParams,
-  ExchangeGetIDResponse,
-  ExchangeGetListParams,
-  ExchangeGetListResponse,
-  ExchangeGetParams,
-  ExchangeGetResponse,
-  Exchanges,
-} from './resources/exchanges/exchanges';
-import { Global, GlobalGetResponse } from './resources/global/global';
-import {
-  NFTGetIDResponse,
-  NFTGetListParams,
-  NFTGetListResponse,
-  NFTGetMarketsParams,
-  NFTGetMarketsResponse,
-  NFTs,
-} from './resources/nfts/nfts';
-import { Onchain } from './resources/onchain/onchain';
-import { Search, SearchGetParams, SearchGetResponse } from './resources/search/search';
-import { Simple } from './resources/simple/simple';
+  User,
+  UserCreateParams,
+  UserCreateWithListParams,
+  UserLoginParams,
+  UserLoginResponse,
+  UserResource,
+  UserUpdateParams,
+} from './resources/user';
+import { Store, StoreListInventoryResponse } from './resources/store/store';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
@@ -62,36 +54,16 @@ import {
 } from './internal/utils/log';
 import { isEmptyObj } from './internal/utils/values';
 
-const environments = {
-  pro: 'https://pro-api.coingecko.com/api/v3',
-  demo: 'https://api.coingecko.com/api/v3',
-};
-type Environment = keyof typeof environments;
-
 export interface ClientOptions {
   /**
-   * CoinGecko Pro API Key
+   * Defaults to process.env['PETSTORE_API_KEY'].
    */
-  proAPIKey?: string | null | undefined;
-
-  /**
-   * CoinGecko Demo API Key
-   */
-  demoAPIKey?: string | null | undefined;
-
-  /**
-   * Specifies the environment to use for the API.
-   *
-   * Each environment maps to a different base URL:
-   * - `pro` corresponds to `https://pro-api.coingecko.com/api/v3`
-   * - `demo` corresponds to `https://api.coingecko.com/api/v3`
-   */
-  environment?: Environment | undefined;
+  apiKey?: string | undefined;
 
   /**
    * Override the default base URL for the API, e.g., "https://api.example.com/v2/"
    *
-   * Defaults to process.env['COINGECKO_BASE_URL'].
+   * Defaults to process.env['OUTLIERPHAROAHCEXCULT_ETH_BASE_URL'].
    */
   baseURL?: string | null | undefined;
 
@@ -145,7 +117,7 @@ export interface ClientOptions {
   /**
    * Set the log level.
    *
-   * Defaults to process.env['COINGECKO_LOG'] or 'warn' if it isn't set.
+   * Defaults to process.env['OUTLIERPHAROAHCEXCULT_ETH_LOG'] or 'warn' if it isn't set.
    */
   logLevel?: LogLevel | undefined;
 
@@ -158,11 +130,10 @@ export interface ClientOptions {
 }
 
 /**
- * API Client for interfacing with the Coingecko API.
+ * API Client for interfacing with the Outlierpharoahcexcult Eth API.
  */
-export class Coingecko {
-  proAPIKey: string | null;
-  demoAPIKey: string | null;
+export class OutlierpharoahcexcultEth {
+  apiKey: string;
 
   baseURL: string;
   maxRetries: number;
@@ -177,12 +148,10 @@ export class Coingecko {
   private _options: ClientOptions;
 
   /**
-   * API Client for interfacing with the Coingecko API.
+   * API Client for interfacing with the Outlierpharoahcexcult Eth API.
    *
-   * @param {string | null | undefined} [opts.proAPIKey=process.env['COINGECKO_PRO_API_KEY'] ?? null]
-   * @param {string | null | undefined} [opts.demoAPIKey=process.env['COINGECKO_DEMO_API_KEY'] ?? null]
-   * @param {Environment} [opts.environment=pro] - Specifies the environment URL to use for the API.
-   * @param {string} [opts.baseURL=process.env['COINGECKO_BASE_URL'] ?? https://pro-api.coingecko.com/api/v3] - Override the default base URL for the API.
+   * @param {string | undefined} [opts.apiKey=process.env['PETSTORE_API_KEY'] ?? undefined]
+   * @param {string} [opts.baseURL=process.env['OUTLIERPHAROAHCEXCULT_ETH_BASE_URL'] ?? https://petstore3.swagger.io/api/v3] - Override the default base URL for the API.
    * @param {number} [opts.timeout=1 minute] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
    * @param {MergedRequestInit} [opts.fetchOptions] - Additional `RequestInit` options to be passed to `fetch` calls.
    * @param {Fetch} [opts.fetch] - Specify a custom `fetch` function implementation.
@@ -191,34 +160,35 @@ export class Coingecko {
    * @param {Record<string, string | undefined>} opts.defaultQuery - Default query parameters to include with every request to the API.
    */
   constructor({
-    baseURL = readEnv('COINGECKO_BASE_URL'),
-    proAPIKey = readEnv('COINGECKO_PRO_API_KEY') ?? null,
-    demoAPIKey = readEnv('COINGECKO_DEMO_API_KEY') ?? null,
+    baseURL = readEnv('OUTLIERPHAROAHCEXCULT_ETH_BASE_URL'),
+    apiKey = readEnv('PETSTORE_API_KEY'),
     ...opts
   }: ClientOptions = {}) {
-    const options: ClientOptions = {
-      proAPIKey,
-      demoAPIKey,
-      ...opts,
-      baseURL,
-      environment: opts.environment ?? 'pro',
-    };
-
-    if (baseURL && opts.environment) {
-      throw new Errors.CoingeckoError(
-        'Ambiguous URL; The `baseURL` option (or COINGECKO_BASE_URL env var) and the `environment` option are given. If you want to use the environment you must pass baseURL: null',
+    if (apiKey === undefined) {
+      throw new Errors.OutlierpharoahcexcultEthError(
+        "The PETSTORE_API_KEY environment variable is missing or empty; either provide it, or instantiate the OutlierpharoahcexcultEth client with an apiKey option, like new OutlierpharoahcexcultEth({ apiKey: 'My API Key' }).",
       );
     }
 
-    this.baseURL = options.baseURL || environments[options.environment || 'pro'];
-    this.timeout = options.timeout ?? Coingecko.DEFAULT_TIMEOUT /* 1 minute */;
+    const options: ClientOptions = {
+      apiKey,
+      ...opts,
+      baseURL: baseURL || `https://petstore3.swagger.io/api/v3`,
+    };
+
+    this.baseURL = options.baseURL!;
+    this.timeout = options.timeout ?? OutlierpharoahcexcultEth.DEFAULT_TIMEOUT /* 1 minute */;
     this.logger = options.logger ?? console;
     const defaultLogLevel = 'warn';
     // Set default logLevel early so that we can log a warning in parseLogLevel.
     this.logLevel = defaultLogLevel;
     this.logLevel =
       parseLogLevel(options.logLevel, 'ClientOptions.logLevel', this) ??
-      parseLogLevel(readEnv('COINGECKO_LOG'), "process.env['COINGECKO_LOG']", this) ??
+      parseLogLevel(
+        readEnv('OUTLIERPHAROAHCEXCULT_ETH_LOG'),
+        "process.env['OUTLIERPHAROAHCEXCULT_ETH_LOG']",
+        this,
+      ) ??
       defaultLogLevel;
     this.fetchOptions = options.fetchOptions;
     this.maxRetries = options.maxRetries ?? 2;
@@ -227,35 +197,33 @@ export class Coingecko {
 
     this._options = options;
 
-    this.proAPIKey = proAPIKey;
-    this.demoAPIKey = demoAPIKey;
+    this.apiKey = apiKey;
   }
 
   /**
    * Create a new client instance re-using the same options given to the current client with optional overriding.
    */
   withOptions(options: Partial<ClientOptions>): this {
-    return new (this.constructor as any as new (props: ClientOptions) => typeof this)({
+    const client = new (this.constructor as any as new (props: ClientOptions) => typeof this)({
       ...this._options,
-      environment: options.environment ? options.environment : undefined,
-      baseURL: options.environment ? undefined : this.baseURL,
+      baseURL: this.baseURL,
       maxRetries: this.maxRetries,
       timeout: this.timeout,
       logger: this.logger,
       logLevel: this.logLevel,
       fetch: this.fetch,
       fetchOptions: this.fetchOptions,
-      proAPIKey: this.proAPIKey,
-      demoAPIKey: this.demoAPIKey,
+      apiKey: this.apiKey,
       ...options,
     });
+    return client;
   }
 
   /**
    * Check whether the base URL is set to its default.
    */
   #baseURLOverridden(): boolean {
-    return this.baseURL !== environments[this._options.environment || 'pro'];
+    return this.baseURL !== 'https://petstore3.swagger.io/api/v3';
   }
 
   protected defaultQuery(): Record<string, string | undefined> | undefined {
@@ -263,61 +231,15 @@ export class Coingecko {
   }
 
   protected validateHeaders({ values, nulls }: NullableHeaders) {
-    if (this.proAPIKey && values.get('x-cg-pro-api-key')) {
-      return;
-    }
-    if (nulls.has('x-cg-pro-api-key')) {
-      return;
-    }
-
-    if (this.demoAPIKey && values.get('x-cg-demo-api-key')) {
-      return;
-    }
-    if (nulls.has('x-cg-demo-api-key')) {
-      return;
-    }
-
-    throw new Error(
-      'Could not resolve authentication method. Expected either proAPIKey or demoAPIKey to be set. Or for one of the "x-cg-pro-api-key" or "x-cg-demo-api-key" headers to be explicitly omitted',
-    );
+    return;
   }
 
-  protected authHeaders(opts: FinalRequestOptions): NullableHeaders | undefined {
-    return buildHeaders([this.proKeyAuth(opts), this.demoKeyAuth(opts)]);
+  protected async authHeaders(opts: FinalRequestOptions): Promise<NullableHeaders | undefined> {
+    return buildHeaders([{ api_key: this.apiKey }]);
   }
 
-  protected proKeyAuth(opts: FinalRequestOptions): NullableHeaders | undefined {
-    if (this.proAPIKey == null) {
-      return undefined;
-    }
-    return buildHeaders([{ 'x-cg-pro-api-key': this.proAPIKey }]);
-  }
-
-  protected demoKeyAuth(opts: FinalRequestOptions): NullableHeaders | undefined {
-    if (this.demoAPIKey == null) {
-      return undefined;
-    }
-    return buildHeaders([{ 'x-cg-demo-api-key': this.demoAPIKey }]);
-  }
-
-  /**
-   * Basic re-implementation of `qs.stringify` for primitive types.
-   */
   protected stringifyQuery(query: Record<string, unknown>): string {
-    return Object.entries(query)
-      .filter(([_, value]) => typeof value !== 'undefined')
-      .map(([key, value]) => {
-        if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-          return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
-        }
-        if (value === null) {
-          return `${encodeURIComponent(key)}=`;
-        }
-        throw new Errors.CoingeckoError(
-          `Cannot stringify type ${typeof value}; Expected string, number, boolean, or null. If you need to pass nested query parameters, you can manually encode them, e.g. { query: { 'foo[key1]': value1, 'foo[key2]': value2 } }, and please open a GitHub issue requesting better support for your use case.`,
-        );
-      })
-      .join('&');
+    return qs.stringify(query, { arrayFormat: 'comma' });
   }
 
   private getUserAgent(): string {
@@ -428,7 +350,9 @@ export class Coingecko {
 
     await this.prepareOptions(options);
 
-    const { req, url, timeout } = this.buildRequest(options, { retryCount: maxRetries - retriesRemaining });
+    const { req, url, timeout } = await this.buildRequest(options, {
+      retryCount: maxRetries - retriesRemaining,
+    });
 
     await this.prepareRequest(req, { url, options });
 
@@ -456,7 +380,7 @@ export class Coingecko {
     const response = await this.fetchWithTimeout(url, req, timeout, controller).catch(castToError);
     const headersTime = Date.now();
 
-    if (response instanceof Error) {
+    if (response instanceof globalThis.Error) {
       const retryMessage = `retrying, ${retriesRemaining} attempts remaining`;
       if (options.signal?.aborted) {
         throw new Errors.APIUserAbortError();
@@ -506,7 +430,7 @@ export class Coingecko {
     } with status ${response.status} in ${headersTime - startTime}ms`;
 
     if (!response.ok) {
-      const shouldRetry = this.shouldRetry(response);
+      const shouldRetry = await this.shouldRetry(response);
       if (retriesRemaining && shouldRetry) {
         const retryMessage = `retrying, ${retriesRemaining} attempts remaining`;
 
@@ -605,7 +529,7 @@ export class Coingecko {
     }
   }
 
-  private shouldRetry(response: Response): boolean {
+  private async shouldRetry(response: Response): Promise<boolean> {
     // Note this is not a standard header.
     const shouldRetryHeader = response.headers.get('x-should-retry');
 
@@ -682,10 +606,10 @@ export class Coingecko {
     return sleepSeconds * jitter * 1000;
   }
 
-  buildRequest(
+  async buildRequest(
     inputOptions: FinalRequestOptions,
     { retryCount = 0 }: { retryCount?: number } = {},
-  ): { req: FinalizedRequestInit; url: string; timeout: number } {
+  ): Promise<{ req: FinalizedRequestInit; url: string; timeout: number }> {
     const options = { ...inputOptions };
     const { method, path, query, defaultBaseURL } = options;
 
@@ -693,7 +617,7 @@ export class Coingecko {
     if ('timeout' in options) validatePositiveInteger('timeout', options.timeout);
     options.timeout = options.timeout ?? this.timeout;
     const { bodyHeaders, body } = this.buildBody({ options });
-    const reqHeaders = this.buildHeaders({ options: inputOptions, method, bodyHeaders, retryCount });
+    const reqHeaders = await this.buildHeaders({ options: inputOptions, method, bodyHeaders, retryCount });
 
     const req: FinalizedRequestInit = {
       method,
@@ -709,7 +633,7 @@ export class Coingecko {
     return { req, url, timeout: options.timeout };
   }
 
-  private buildHeaders({
+  private async buildHeaders({
     options,
     method,
     bodyHeaders,
@@ -719,7 +643,7 @@ export class Coingecko {
     method: HTTPMethod;
     bodyHeaders: HeadersLike;
     retryCount: number;
-  }): Headers {
+  }): Promise<Headers> {
     let idempotencyHeaders: HeadersLike = {};
     if (this.idempotencyHeader && method !== 'get') {
       if (!options.idempotencyKey) options.idempotencyKey = this.defaultIdempotencyKey();
@@ -735,7 +659,7 @@ export class Coingecko {
         ...(options.timeout ? { 'X-Stainless-Timeout': String(Math.trunc(options.timeout / 1000)) } : {}),
         ...getPlatformHeaders(),
       },
-      this.authHeaders(options),
+      await this.authHeaders(options),
       this._options.defaultHeaders,
       bodyHeaders,
       options.headers,
@@ -763,7 +687,7 @@ export class Coingecko {
         // Preserve legacy string encoding behavior for now
         headers.values.has('content-type')) ||
       // `Blob` is superset of `File`
-      body instanceof Blob ||
+      ((globalThis as any).Blob && body instanceof (globalThis as any).Blob) ||
       // `FormData` -> `multipart/form-data`
       body instanceof FormData ||
       // `URLSearchParams` -> `application/x-www-form-urlencoded`
@@ -783,10 +707,10 @@ export class Coingecko {
     }
   }
 
-  static Coingecko = this;
+  static OutlierpharoahcexcultEth = this;
   static DEFAULT_TIMEOUT = 60000; // 1 minute
 
-  static CoingeckoError = Errors.CoingeckoError;
+  static OutlierpharoahcexcultEthError = Errors.OutlierpharoahcexcultEthError;
   static APIError = Errors.APIError;
   static APIConnectionError = Errors.APIConnectionError;
   static APIConnectionTimeoutError = Errors.APIConnectionTimeoutError;
@@ -802,90 +726,44 @@ export class Coingecko {
 
   static toFile = Uploads.toFile;
 
-  assetPlatforms: API.AssetPlatforms = new API.AssetPlatforms(this);
-  coins: API.Coins = new API.Coins(this);
-  companies: API.Companies = new API.Companies(this);
-  derivatives: API.Derivatives = new API.Derivatives(this);
-  exchangeRates: API.ExchangeRates = new API.ExchangeRates(this);
-  exchanges: API.Exchanges = new API.Exchanges(this);
-  global: API.Global = new API.Global(this);
-  key: API.Key = new API.Key(this);
-  nfts: API.NFTs = new API.NFTs(this);
-  onchain: API.Onchain = new API.Onchain(this);
-  ping: API.Ping = new API.Ping(this);
-  search: API.Search = new API.Search(this);
-  simple: API.Simple = new API.Simple(this);
-  tokenLists: API.TokenLists = new API.TokenLists(this);
+  pet: API.PetResource = new API.PetResource(this);
+  store: API.Store = new API.Store(this);
+  user: API.UserResource = new API.UserResource(this);
 }
-Coingecko.AssetPlatforms = AssetPlatforms;
-Coingecko.Coins = Coins;
-Coingecko.Companies = Companies;
-Coingecko.Derivatives = Derivatives;
-Coingecko.ExchangeRates = ExchangeRates;
-Coingecko.Exchanges = Exchanges;
-Coingecko.Global = Global;
-Coingecko.Key = Key;
-Coingecko.NFTs = NFTs;
-Coingecko.Onchain = Onchain;
-Coingecko.Ping = Ping;
-Coingecko.Search = Search;
-Coingecko.Simple = Simple;
-Coingecko.TokenLists = TokenLists;
-export declare namespace Coingecko {
+
+OutlierpharoahcexcultEth.PetResource = PetResource;
+OutlierpharoahcexcultEth.Store = Store;
+OutlierpharoahcexcultEth.UserResource = UserResource;
+
+export declare namespace OutlierpharoahcexcultEth {
   export type RequestOptions = Opts.RequestOptions;
 
   export {
-    AssetPlatforms as AssetPlatforms,
-    type AssetPlatformGetResponse as AssetPlatformGetResponse,
-    type AssetPlatformGetParams as AssetPlatformGetParams,
+    PetResource as PetResource,
+    type Category as Category,
+    type Pet as Pet,
+    type PetFindByStatusResponse as PetFindByStatusResponse,
+    type PetFindByTagsResponse as PetFindByTagsResponse,
+    type PetUploadImageResponse as PetUploadImageResponse,
+    type PetCreateParams as PetCreateParams,
+    type PetUpdateParams as PetUpdateParams,
+    type PetFindByStatusParams as PetFindByStatusParams,
+    type PetFindByTagsParams as PetFindByTagsParams,
+    type PetUpdateByIDParams as PetUpdateByIDParams,
+    type PetUploadImageParams as PetUploadImageParams,
   };
+
+  export { Store as Store, type StoreListInventoryResponse as StoreListInventoryResponse };
 
   export {
-    Coins as Coins,
-    type CoinGetIDResponse as CoinGetIDResponse,
-    type CoinGetIDParams as CoinGetIDParams,
+    UserResource as UserResource,
+    type User as User,
+    type UserLoginResponse as UserLoginResponse,
+    type UserCreateParams as UserCreateParams,
+    type UserUpdateParams as UserUpdateParams,
+    type UserCreateWithListParams as UserCreateWithListParams,
+    type UserLoginParams as UserLoginParams,
   };
 
-  export { Companies as Companies };
-
-  export { Derivatives as Derivatives, type DerivativeGetResponse as DerivativeGetResponse };
-
-  export { ExchangeRates as ExchangeRates, type ExchangeRateGetResponse as ExchangeRateGetResponse };
-
-  export {
-    Exchanges as Exchanges,
-    type ExchangeGetResponse as ExchangeGetResponse,
-    type ExchangeGetIDResponse as ExchangeGetIDResponse,
-    type ExchangeGetListResponse as ExchangeGetListResponse,
-    type ExchangeGetParams as ExchangeGetParams,
-    type ExchangeGetIDParams as ExchangeGetIDParams,
-    type ExchangeGetListParams as ExchangeGetListParams,
-  };
-
-  export { Global as Global, type GlobalGetResponse as GlobalGetResponse };
-
-  export { Key as Key, type KeyGetResponse as KeyGetResponse };
-
-  export {
-    NFTs as NFTs,
-    type NFTGetIDResponse as NFTGetIDResponse,
-    type NFTGetListResponse as NFTGetListResponse,
-    type NFTGetMarketsResponse as NFTGetMarketsResponse,
-    type NFTGetListParams as NFTGetListParams,
-    type NFTGetMarketsParams as NFTGetMarketsParams,
-  };
-
-  export { Onchain as Onchain };
-
-  export { Ping as Ping, type PingGetResponse as PingGetResponse };
-
-  export {
-    Search as Search,
-    type SearchGetResponse as SearchGetResponse,
-    type SearchGetParams as SearchGetParams,
-  };
-
-  export { Simple as Simple };
-
-  export { TokenLists as TokenLists, type TokenListGetAllJsonResponse as TokenListGetAllJsonResponse };
+  export type Order = API.Order;
 }
